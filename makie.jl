@@ -1,7 +1,13 @@
 using CairoMakie
 
 
-xs = range(0, 10, length = 30)
-ys = 0.5 .* sin.(xs)
+f = Figure()
+Axis(f[1, 1])
 
-scatter(xs, ys)
+xs = LinRange(0, 10, 100)
+ys = LinRange(0, 15, 100)
+zs = [cos(x) * sin(y) for x in xs, y in ys]
+
+contour!(zs,levels=-1:0.1:1)
+
+f
