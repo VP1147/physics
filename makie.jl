@@ -1,5 +1,7 @@
 using CairoMakie
+using ElectronDisplay
 
+ElectronDisplay.CONFIG.showable = showable
 
 f = Figure()
 Axis(f[1, 1])
@@ -10,4 +12,7 @@ zs = [cos(x) * sin(y) for x in xs, y in ys]
 
 contour!(zs,levels=-1:0.1:1)
 
-f
+display(f)
+
+println("Waiting for key press ...")
+readline()
