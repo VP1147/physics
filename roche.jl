@@ -1,4 +1,10 @@
-using Gadfly
+using CairoMakie
+using ElectronDisplay
+
+ElectronDisplay.CONFIG.showable = showable
+
+f = Figure()
+Axis(f[1, 1])
 
 function roche_distance(R, M, m)
 	d = R * (2*M/m)^(1/3)
@@ -17,15 +23,19 @@ moon_mass = 7.34e22					# Moon mass (Kg)
 # 	println(round(roche_distance(earth_radius, earth_mass, i*1e20), digits=3))
 # end
 
-roche = []
-
 # for i in 1:100
 # 	push!(roche, roche_distance(earth_radius, earth_mass, i*1e21))
 # end
 
-# plot(y=roche)
+xs = LinRange(1e21, 1e23, 100)
 
-plot([sin,cos], 0, 2pi)
+for i in LinRange(1e21, 1e23, 100)
+	push!(ys, roche_distance(earth_radius, earth_mass, i))
+end
+
+plot!(xs, ys)
+
+display(f)
 
 println("Waiting for key press ...")
 readline()
