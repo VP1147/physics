@@ -1,3 +1,15 @@
+// Simulador de Gás Ideal - Simula um conjunto de partículas 
+// de massa definida contidas em um espaço (janela), dada uma
+// certa temperatura, a partir da distribuição de velocidades
+// de Boltzmann. Para visualização, foi incluido um fator de
+// velocidade (menor = mais lento).
+
+// Vinícius A. Pavão - Aluno de Graduação
+// Instituto de Física - UFMS
+
+// Para compilar no GNU/Linux:
+// $ gcc colision.c -o colision -lSDL2 -lSDL2_ttf -lm
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdlib.h>
@@ -7,8 +19,8 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define RECT_SIZE 1
-#define NUM_RECTS 5000
-#define TEMPERATURE 300.0       // Temperatura absoluta (K)
+#define NUM_RECTS 10000
+#define TEMPERATURE 273.0       // Temperatura absoluta (K)
 #define MASS_IN_U 18.0          // Massa das partículas (u)
 #define SPEED_FACTOR 1/1000     // Fator de velocidade
 #define FONT_SIZE 14
@@ -23,16 +35,17 @@ typedef struct {
 } Rectangle;
 
 float generateBoltzmannVelocity(float temperature, float mass) {
-    const float k = 1.380649e-23; // Constante de Boltzmann em J/K
-    const float uToKg = 1.66053906660e-27; // Conversão de unidades de massa atômica para quilogramas
+    const float k = 1.380649e-23;                           // Constante de Boltzmann em J/K
+    const float uToKg = 1.66053906660e-27;                  // Conversão de unidades de massa atômica para quilogramas
     float boltzmannDistribution = sqrtf(-2.0f * k * temperature / (mass * uToKg) * logf(rand() / (float)RAND_MAX));
     return boltzmannDistribution;
 }
 
 void updateRectangle(Rectangle *rect) {
-    rect->x += rect->dx * SPEED_FACTOR;
-    rect->y += rect->dy * SPEED_FACTOR;
+    rect->x += rect->dx * SPEED_FACTOR; // Variacao de posicao em X
+    rect->y += rect->dy * SPEED_FACTOR; // Variacao de posicao em Y
 
+    // Detecta colisao com as bordas da janela
     if (rect->x < 0 || rect->x + RECT_SIZE > WINDOW_WIDTH) {
         rect->dx *= -1;
     }
@@ -62,53 +75,59 @@ int main(int argc, char *argv[]) {
     Rectangle rects[NUM_RECTS];
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        // Caso SDL nao consiga inicializar
         printf("Falha ao inicializar a SDL: %s\n", SDL_GetError());
         return -1;
     }
 
-    window = SDL_CreateWindow("Simulador de Colisão", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Simulador de Gás Ideal", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL) {
+        // Caso nao consiga criar a janela
         printf("Falha ao criar a janela: %s\n", SDL_GetError());
         return -1;
     }
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL) {
+        // Caso nao consiga criar o renderer
         printf("Falha ao criar o renderer: %s\n", SDL_GetError());
         return -1;
     }
 
     if (TTF_Init() < 0) {
+        // Caso nao consiga inicializar a biblioteca SDL_ttf
         printf("Falha ao inicializar a biblioteca SDL_ttf: %s\n", TTF_GetError());
         return -1;
     }
 
     font = TTF_OpenFont(FONT_PATH, FONT_SIZE);
     if (font == NULL) {
+        // Caso nao consiga carregar a fonte
         printf("Falha ao carregar a fonte: %s\n", TTF_GetError());
         return -1;
     }
-
+    // Recarrega o gerador de valores pseudoaleatorios
     srand(time(NULL));
 
     for (int i = 0; i < NUM_RECTS; i++) {
+        // Atribui posicoes aleatorias para as particulas
         rects[i].x = rand() % (WINDOW_WIDTH - RECT_SIZE);
         rects[i].y = rand() % (WINDOW_HEIGHT - RECT_SIZE);
 
-        // Gerar velocidades aleatórias baseadas na distribuição de Boltzmann
+        // Gera velocidades aleatórias baseadas na distribuição de Boltzmann
         rects[i].dx = generateBoltzmannVelocity(TEMPERATURE, MASS_IN_U) * sqrtf(TEMPERATURE);
         rects[i].dy = generateBoltzmannVelocity(TEMPERATURE, MASS_IN_U) * sqrtf(TEMPERATURE);
     }
 
     while (!quit) {
+        // Delay entre frames (ms)
         SDL_Delay(1000/FPS);
-
+        // Caso janela ser fechada
         while (SDL_PollEvent(&event) != 0) {
             if (event.type == SDL_QUIT) {
                 quit = 1;
             }
         }
-
         for (int i = 0; i < NUM_RECTS; i++) {
             updateRectangle(&rects[i]);
         }
@@ -143,7 +162,6 @@ int main(int argc, char *argv[]) {
         renderText(renderer, font, averageVelocityText, 10, 60);
 
         SDL_RenderPresent(renderer);
-
     }
 
     SDL_DestroyRenderer(renderer);
