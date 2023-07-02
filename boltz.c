@@ -8,7 +8,8 @@
 // Instituto de Física - UFMS
 
 // Para compilar no GNU/Linux:
-// $ gcc colision.c -o colision -lSDL2 -lSDL2_ttf -lm
+// $ gcc boltz.c -o boltz -lSDL2 -lSDL2_ttf -lm
+// Execução: $ ./boltz
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
