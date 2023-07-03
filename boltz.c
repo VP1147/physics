@@ -17,16 +17,18 @@
 #include <time.h>
 #include <math.h>
 
-#define WINDOW_WIDTH 800
+#define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
 #define RECT_SIZE 1
-#define NUM_RECTS 10000
+#define NUM_RECTS 1000
 #define TEMPERATURE 273.0       // Temperatura absoluta (K)
 #define MASS_IN_U 18.0          // Massa das partículas (u)
 #define SPEED_FACTOR 1/1000     // Fator de velocidade
 #define FONT_SIZE 14
 #define FONT_PATH "FreeMono.ttf"
 #define FPS 60                  // Frames por segundo
+
+#define COL_FLASH 5
 
 typedef struct {
     float x;
@@ -138,7 +140,15 @@ int main(int argc, char *argv[]) {
 
         for (int i = 0; i < NUM_RECTS; i++) {
             SDL_Rect sdlRect = {(int)rects[i].x, (int)rects[i].y, RECT_SIZE, RECT_SIZE};
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            if (rects[i].x < COL_FLASH || rects[i].x + COL_FLASH > WINDOW_WIDTH) {
+                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            }
+            else if (rects[i].y < COL_FLASH || rects[i].y + COL_FLASH > WINDOW_HEIGHT) {
+                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            }
+            else { 
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            }
             SDL_RenderFillRect(renderer, &sdlRect);
         }
 
