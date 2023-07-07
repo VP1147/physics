@@ -21,7 +21,7 @@
 #define WINDOW_HEIGHT 600
 #define RECT_SIZE 2
 #define NUM_RECTS 5000
-#define TEMPERATURE 273.0       // Temperatura absoluta (K)
+#define TEMPERATURE 100.0       // Temperatura absoluta (K)
 #define MASS_IN_U 18.0          // Massa das partículas (u)
 #define SPEED_FACTOR 1/1000     // Fator de velocidade
 #define FONT_SIZE 14
