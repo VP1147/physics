@@ -13,23 +13,23 @@ GNU General Public License for more details.
 */
 
 // gcc -o eletromag eletromag.c -I/usr/include/SDL2 -D_REENTRANT -lSDL2 -lSDL2_ttf -lm
-
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <stdio.h>
 #include <math.h>
 
 // Tamanho da janela
-#define WIDTH 200
-#define HEIGHT 200
+#define WIDTH   600
+#define HEIGHT  600
+#define ZF      3
 
 // Constantes
-#define PI 3.1415
+#define PI 3.14
 #define MU0 (4 * PI * 1e-7)
 
 // Variaveis
 #define PERIOD 0.1             // rad/s 
-#define MAGMOMENT 1e12
+#define MAGMOMENT 5e10
 
 typedef struct {
     double x;
@@ -140,8 +140,8 @@ int main(int argc, char* argv[]) {
         // Desenha o objeto magnético
         renderFillCircle(renderer, (int)object.x, (int)object.y, (int)object.radius);
 
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0; x < WIDTH*ZF; x+=(ZF)) {
+            for (int y = 0; y < HEIGHT*ZF; y+=(ZF)) {
                 double Bx, By;
                 calculateMagneticField(object, x, y, &Bx, &By);
 
