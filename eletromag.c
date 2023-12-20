@@ -21,15 +21,16 @@ GNU General Public License for more details.
 // Tamanho da janela
 #define WIDTH   600
 #define HEIGHT  600
-#define ZF      3
+#define ZF      2           // Fator de ampliacao
 
 // Constantes
 #define PI 3.14
 #define MU0 (4 * PI * 1e-7)
 
 // Variaveis
-#define PERIOD 0.1             // rad/s 
-#define MAGMOMENT 5e10
+#define PERIOD      0.1     // rad/s 
+#define MAGMOMENT   5e10    // Momento magnetico [N/C]
+#define RADIUS      10      // Raio do objeto (m)
 
 typedef struct {
     double x;
@@ -50,11 +51,7 @@ void calculateMagneticField(MagneticObject object, double x, double y, double* B
         *By = 0;
     } else {
         double theta = atan2(dy, dx);
-
-        // Introduza uma variável de tempo para animação
         double time = SDL_GetTicks() / 1000.0; // Tempo em segundos
-
-        // Modifique o campo magnético com base no tempo
         double angularFrequency = 2 * PI * PERIOD; // Frequência angular de PERIOD rad/s
         double phase = angularFrequency * time;
 
@@ -117,8 +114,8 @@ int main(int argc, char* argv[]) {
     MagneticObject object;
     object.x = WIDTH / 2.0;
     object.y = HEIGHT / 2.0;
-    object.magneticMoment = MAGMOMENT; // Momento magnético do objeto
-    object.radius = 25.0; // Raio do objeto
+    object.magneticMoment = MAGMOMENT;      // Momento magnético do objeto
+    object.radius = RADIUS;                 // Raio do objeto
 
     SDL_Event event;
     int running = 1;
@@ -139,25 +136,31 @@ int main(int argc, char* argv[]) {
 
         // Desenha o objeto magnético
         renderFillCircle(renderer, (int)object.x, (int)object.y, (int)object.radius);
-
-        for (int x = 0; x < WIDTH*ZF; x+=(ZF)) {
-            for (int y = 0; y < HEIGHT*ZF; y+=(ZF)) {
+        Uint8 r; Uint8 g; Uint8 b;
+        for (int x = 0; x < WIDTH; x++) {
+            //printf("%d", x % ZF);
+            for (int y = 0; y < HEIGHT; y++) {
                 double Bx, By;
-                calculateMagneticField(object, x, y, &Bx, &By);
-
+                if(x % ZF == 0) {
+                    if(y % ZF == 0) {
+                        calculateMagneticField(object, x, y, &Bx, &By);
+                        r = (Uint8)(fabs(Bx) * 255);
+                        g = (Uint8)(fabs(By) * 255);
+                        b = 0;
+                    }
+                }
+                
                 // Mapeie os valores de Bx e By para uma cor
-                Uint8 r = (Uint8)(fabs(Bx) * 255);
-                Uint8 g = (Uint8)(fabs(By) * 255);
-                Uint8 b = 0;
+
                 SDL_SetRenderDrawColor(renderer, r, g, b, 255);
                 SDL_RenderDrawPoint(renderer, x, y);
             }
         }
 
         // Renderiza o texto no canto inferior esquerdo
-        char text[100];
+        char text[50];
         double time = SDL_GetTicks() / 1000.0; // Tempo em segundos
-        snprintf(text, sizeof(text), "FPS: %.2f   Momento: %.2f", fps, object.magneticMoment);
+        snprintf(text, sizeof(text), "FPS: %.2f   Momento: %.2E   R: %.2f", fps, object.magneticMoment, object.radius);
 
         SDL_Color textColor = {255, 255, 255, 255}; // Cor do texto (branco)
         SDL_Surface* textSurface = TTF_RenderText_Solid(font, text, textColor);
