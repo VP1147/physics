@@ -6,7 +6,7 @@
 import math as m
 
 def f(x):
-	return m.sin(x**2)
+	return m.sin(x)
 
 # h - Altura (unidades)
 # l - Comprimento (unidades)
