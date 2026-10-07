@@ -12,7 +12,7 @@ function roche_distance(R, M, m)
 end
 
 earth_radius = 6378					# Earth radius (Km)
-earth_mass = 5.97e24				# Earth mass (kg)
+earth_mass = 5.97e24					# Earth mass (kg)
 
 moon_mass = 7.34e22					# Moon mass (Kg)
 
