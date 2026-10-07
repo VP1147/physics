@@ -1,3 +1,4 @@
+import Pkg; Pkg.add("CairoMakie")
 using CairoMakie
 using ElectronDisplay
 
